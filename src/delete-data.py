@@ -25,7 +25,7 @@ test_role_id = 0
 user_ids = []
 for role in json_data:
     if role["name"] == "Test":
-        user_ids = role["user_ids"]
+        user_ids = role["users"]
         test_role_id = role["id"]
         break
 

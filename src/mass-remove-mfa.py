@@ -27,7 +27,13 @@ response = requests.post(api_domain + '/api/2/roles', headers=headers, data=json
 json_data = json.loads(response.content)
 test_role_id = json_data['id']
 
-# 3. Create a couple of users. 
+
+# 3. Get OneLoginMFAGroup group
+response = requests.get(api_domain + '/api/1/groups', headers=headers)
+json_data = json.loads(response.content)
+group_id = json_data['data'][0]['id']
+
+# 4. Create a couple of users. 
 user_data = {
     "email": "amelie.gagnon@myemail.com",
     "firstname": "Amélie",
@@ -35,7 +41,8 @@ user_data = {
     "username": "Amélie Gagnon",
     "role_ids":[
             str(test_role_id)
-         ]
+         ],
+    "group_id": str(group_id)
 }
 
 response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
@@ -50,14 +57,45 @@ user_data = {
     "username": "Thomas Tremblay",
     "role_ids":[
             str(test_role_id)
-         ]
+         ],
+    "group_id": str(group_id)
 }
 
 response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
 json_data = json.loads(response.content)
 user2_id = json_data['id']
 
-# 4. Delete data
-# response = requests.delete(api_domain + '/api/2/users/' + str(user1_id), headers=headers)
-# response = requests.delete(api_domain + '/api/2/users/' + str(user2_id), headers=headers)
+# 4. Get available factors
+response = requests.get(api_domain + '/api/2/mfa/users/' + str(user1_id) + '/factors', headers=headers)
+json_data = json.loads(response.content)
+factor_id = 0
+for factor in json_data:
+    if factor["name"] == "OneLogin Email":
+        factor_id = factor["factor_id"]
+        break
+
+# mfa_data = {
+#     "factor_id": str(factor_id),
+#     "display_name": "OneLogin Email"
+# }
+
+# # 5. Enroll a Factor
+# response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/registrations', headers=headers, data=json.dumps(mfa_data))
+
+activate_data = {
+    "device_id": str(factor_id),
+    "expires_in": 900
+}
+
+# 5. Activate a Factor
+response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/verifications', headers=headers, data=json.dumps(activate_data))
+
+# 6. Get Enrolled Factors
+response = requests.get(api_domain + '/api/2/mfa/users/' + str(user1_id) + '/devices', headers=headers)
+json_data = json.loads(response.content)
+device_id = 0
+for device in json_data:
+    if factor["auth_factor_name"] == "OneLogin Email":
+        device_id = factor["device_id"]
+        break
 
