@@ -74,21 +74,16 @@ for factor in json_data:
         factor_id = factor["factor_id"]
         break
 
-# mfa_data = {
-#     "factor_id": str(factor_id),
-#     "display_name": "OneLogin Email"
-# }
-
-# # 5. Enroll a Factor
-# response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/registrations', headers=headers, data=json.dumps(mfa_data))
-
-activate_data = {
-    "device_id": str(factor_id),
-    "expires_in": 900
+mfa_data = {
+    "factor_id": str(factor_id),
+    "display_name": "OneLogin Email"
 }
 
-# 5. Activate a Factor
-response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/verifications', headers=headers, data=json.dumps(activate_data))
+# 5. Enroll a Factor
+response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/registrations', headers=headers, data=json.dumps(mfa_data))
+
+# THE ABOVE POST REQUEST WILL PRODUCE A HTTP 401 UNAUTHORIZED
+
 
 # 6. Get Enrolled Factors
 response = requests.get(api_domain + '/api/2/mfa/users/' + str(user1_id) + '/devices', headers=headers)
