@@ -42,7 +42,8 @@ user_data = {
     "role_ids":[
             str(test_role_id)
          ],
-    "group_id": str(group_id)
+    "group_id": str(group_id),
+    "phone": "+5511998215929"
 }
 
 response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
@@ -70,17 +71,26 @@ response = requests.get(api_domain + '/api/2/mfa/users/' + str(user1_id) + '/fac
 json_data = json.loads(response.content)
 factor_id = 0
 for factor in json_data:
-    if factor["name"] == "OneLogin Email":
+    if factor["name"] == "OneLogin SMS":
         factor_id = factor["factor_id"]
         break
 
+# 5. Enroll a Factor
+
+# mfa_data = {
+#     "factor_id": str(factor_id),
+#     "display_name": "OneLogin SMS"
+# }
+
+# response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/registrations', headers=headers, data=json.dumps(mfa_data))
+
 mfa_data = {
     "factor_id": str(factor_id),
-    "display_name": "OneLogin Email"
+    "display_name": "OneLogin SMS",
+    "number": "+5511998215929"
 }
 
-# 5. Enroll a Factor
-response = requests.post(api_domain + '/api/2/users/' + str(user1_id) + '/registrations', headers=headers, data=json.dumps(mfa_data))
+response = requests.post(api_domain + '/api/1/users/' + str(user1_id) + '/otp_devices', headers=headers, data=json.dumps(mfa_data))
 
 # THE ABOVE POST REQUEST WILL PRODUCE A HTTP 401 UNAUTHORIZED
 
@@ -90,7 +100,7 @@ response = requests.get(api_domain + '/api/2/mfa/users/' + str(user1_id) + '/dev
 json_data = json.loads(response.content)
 device_id = 0
 for device in json_data:
-    if factor["auth_factor_name"] == "OneLogin Email":
+    if factor["auth_factor_name"] == "OneLogin SMS":
         device_id = factor["device_id"]
         break
 
