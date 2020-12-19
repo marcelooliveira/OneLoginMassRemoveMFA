@@ -34,7 +34,7 @@ def get_user_ids():
 
 def remove_factor_for_each_user(user_ids, factor_name):
     for user_id in user_ids:
-        print("looking for devices enrolled with OneLogin Protect")
+        print("looking for devices enrolled with: " + factor_name)
         print("==================================================")
         print("user id: " + str(user_id))
         device_id = get_enrolled_mfa_device(user_id, factor_name)

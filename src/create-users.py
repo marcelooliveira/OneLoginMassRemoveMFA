@@ -18,11 +18,6 @@ response = r.json()
 access_token = response['access_token']
 headers = headers = {'Authorization': 'Bearer ' + access_token, 'content-type': 'application/json'}
 
-
-
-
-
-
 # 2. Get the role named "Test". 
 response = requests.get(api_domain + '/api/2/roles?name=Test', headers=headers)
 json_data = json.loads(response.content)
@@ -42,17 +37,7 @@ for user_id in user_ids:
 # 4. Delete test role
 requests.delete(api_domain + '/api/2/roles/' + str(test_role_id), headers=headers)
 
-
-
-
-
-
-
-
-
-
-
-# 2. Create a role named "Test". 
+# 5. Create a role named "Test". 
 role_data = {
     "name":"Test"
 }
@@ -61,25 +46,19 @@ response = requests.post(api_domain + '/api/2/roles', headers=headers, data=json
 json_data = json.loads(response.content)
 test_role_id = json_data['id']
 
-
-# 3. Get OneLoginMFAGroup group
-response = requests.get(api_domain + '/api/1/groups', headers=headers)
-json_data = json.loads(response.content)
-group_id = json_data['data'][0]['id']
-
-# 4. Create some users. 
-for n in [1,2,3,4,5]:
+# 6. Create some users. 
+r = range(5)
+for n in r:
     user_data = {
-        "email": "user" + str(n) + "@myemail.com",
+        "email": "user" + str(n + 1) + "@myemail.com",
         "firstname": "user",
-        "lastname": "name",
-        "username": "user" + str(n),
-        "password": "useruser" + str(n),
-        "password_confirmation": "useruser" + str(n),
+        "lastname": ["one", "two", "three", "four", "five"][n],
+        "username": "user" + str(n + 1),
+        "password": "useruser" + str(n + 1),
+        "password_confirmation": "useruser" + str(n + 1),
         "role_ids":[
                 str(test_role_id)
-            ],
-        "group_id": str(group_id)
+            ]
     }
 
     response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
