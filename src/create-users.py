@@ -67,38 +67,21 @@ response = requests.get(api_domain + '/api/1/groups', headers=headers)
 json_data = json.loads(response.content)
 group_id = json_data['data'][0]['id']
 
-# 4. Create a couple of users. 
-user_data = {
-    "email": "user1@myemail.com",
-    "firstname": "user",
-    "lastname": "one",
-    "username": "user1",
-    "password": "useruser1",
-    "password_confirmation": "useruser1",
-    "role_ids":[
-            str(test_role_id)
-         ],
-    "group_id": str(group_id)
-}
+# 4. Create some users. 
+for n in [1,2,3,4,5]:
+    user_data = {
+        "email": "user" + str(n) + "@myemail.com",
+        "firstname": "user",
+        "lastname": "name",
+        "username": "user" + str(n),
+        "password": "useruser" + str(n),
+        "password_confirmation": "useruser" + str(n),
+        "role_ids":[
+                str(test_role_id)
+            ],
+        "group_id": str(group_id)
+    }
 
-response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
-json_data = json.loads(response.content)
-user1_id = json_data['id']
-response = requests.put(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
+    response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
+    json_data = json.loads(response.content)
 
-user_data = {
-    "email": "user2@myemail.com",
-    "firstname": "user",
-    "lastname": "two",
-    "username": "user2",
-    "password": "useruser2",
-    "password_confirmation": "useruser2",
-    "role_ids":[
-            str(test_role_id)
-         ],
-    "group_id": str(group_id)
-}
-
-response = requests.post(api_domain + '/api/2/users', headers=headers, data=json.dumps(user_data))
-json_data = json.loads(response.content)
-user2_id = json_data['id']

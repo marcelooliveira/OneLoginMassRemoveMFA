@@ -5,8 +5,6 @@ from mysecrets import ONELOGIN_CLIENT_ID, ONELOGIN_CLIENT_SECRET
 import requests
 import json
 
-
-
 def get_onelogin_headers():
     r = requests.post(api_domain + '/auth/oauth2/v2/token',
     auth=(ONELOGIN_CLIENT_ID, ONELOGIN_CLIENT_SECRET),
@@ -27,13 +25,27 @@ def get_user_ids():
         if role["name"] == "Test":
             user_ids = role["users"]
             break
+
+    print("user ids under the Test role:")
+    print("=============================")
+    print(user_ids)
+    print()
     return user_ids
 
 def remove_factor_for_each_user(user_ids, factor_name):
     for user_id in user_ids:
+        print("looking for devices enrolled with OneLogin Protect")
+        print("==================================================")
+        print("user id: " + str(user_id))
         device_id = get_enrolled_mfa_device(user_id, factor_name)
         if device_id:
+            print("enrolled device id: " + str(device_id))
+            print("removing MFA enrolled with device id: " + str(device_id))
             remove_mfa_device(user_id, device_id)
+
+        else:
+            print("no enrolled device")
+        print()
 
 def get_enrolled_mfa_device(user_id, factor_name):
     response = requests.get(api_domain + '/api/1/users/' + str(user_id) + '/otp_devices', headers=headers)
@@ -46,8 +58,9 @@ def get_enrolled_mfa_device(user_id, factor_name):
     return device_id
 
 def remove_mfa_device(user_id, device_id):
-    requests.delete(api_domain + '/api/1/users/' + str(user_id) + '/otp_devices/' + str(device_id), headers=headers)
-
+    response = requests.delete(api_domain + '/api/1/users/' + str(user_id) + '/otp_devices/' + str(device_id), headers=headers)
+    json_data = json.loads(response.content)
+    print("removal result: " + json_data["status"]["message"])
 
 api_domain = 'https://api.us.onelogin.com'
 factor_name = "OneLogin Protect"
