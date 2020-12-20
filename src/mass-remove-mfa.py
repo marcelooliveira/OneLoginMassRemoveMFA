@@ -17,16 +17,16 @@ def get_onelogin_headers():
     access_token = response['access_token']
     return {'Authorization': 'Bearer ' + access_token, 'content-type': 'application/json'}
 
-def get_user_ids():
-    response = requests.get(api_domain + '/api/2/roles?name=Test', headers=headers)
+def get_user_ids(role_name):
+    response = requests.get(api_domain + '/api/2/roles', headers=headers)
     json_data = json.loads(response.content)
     user_ids = []
     for role in json_data:
-        if role["name"] == "Test":
+        if role["name"] == role_name:
             user_ids = role["users"]
             break
 
-    print("user ids under the Test role:")
+    print("user ids under the " + role_name + " role:")
     print("=============================")
     print(user_ids)
     print()
@@ -62,12 +62,13 @@ def remove_mfa_device(user_id, device_id):
     json_data = json.loads(response.content)
     print("removal result: " + json_data["status"]["message"])
 
-api_domain = 'https://api.us.onelogin.com'
+api_domain = "https://api.us.onelogin.com"
+role_name = "Test"
 factor_name = "OneLogin Protect"
 
-# 1. Complete the following steps using the OneLogin API.
+# 1. Obtain the request headers for your OneLogin API.
 headers = get_onelogin_headers()
-# 2. Get the role named "Test". 
-user_ids = get_user_ids()
+# 2. Get the users with the test role. 
+user_ids = get_user_ids(role_name)
 # 3. Remove factor for each user
 remove_factor_for_each_user(user_ids, factor_name)
